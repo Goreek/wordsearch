@@ -3,11 +3,14 @@ use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
+use wchar::*;
+use widestring::ustring::WideString;
+use widestring::WideChar;
 
 struct WordSearch {
     width: usize,
     height: usize,
-    board: Vec<Vec<char>>,
+    board: Vec<Vec<wchar_t>>,
     rng: StdRng,
     empty: bool,
 }
@@ -17,7 +20,7 @@ impl WordSearch {
         WordSearch {
             width: sz,
             height: sz,
-            board: vec![vec!['.'; sz]; sz],
+            board: vec![vec!['.' as WideChar; sz]; sz],
             rng: StdRng::seed_from_u64(seed),
             empty: true,
         }
@@ -25,7 +28,11 @@ impl WordSearch {
 
     pub fn print(&self) {
         for line in self.board.iter() {
-            println!("{:?}", line);
+            let str_line: Vec<String> = line
+                .iter()
+                .map(|&c| WideString::from_vec(vec![c]).to_string_lossy())
+                .collect();
+            println!("{:?}", str_line);
         }
     }
 
@@ -37,7 +44,7 @@ impl WordSearch {
         }
     }
 
-    fn try_add_word(&mut self, word: &String, need_shared: bool) -> bool {
+    fn try_add_word(&mut self, word: &WideString, need_shared: bool) -> bool {
         let vd: i32 = self.rng.gen_range(-1..=1);
         let y0 = match vd {
             1 => self.rng.gen_range(0..(self.height - word.len())),
@@ -60,26 +67,24 @@ impl WordSearch {
             _ => self.rng.gen_range(0..self.width),
         };
 
-        //println!("vd{},y0{},hd{},x0{}",vd,y0,hd,x0);
-
         if need_shared && !self.empty {
-            if !word.chars().into_iter().enumerate().any(|(i, c)| {
+            if !word.chars_lossy().into_iter().enumerate().any(|(i, c)| {
                 let bc = self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)];
-                bc == c
+                bc == c as WideChar
             }) {
                 return false;
             }
         };
 
-        if !word.chars().into_iter().enumerate().all(|(i, c)| {
+        if !word.chars_lossy().into_iter().enumerate().all(|(i, c)| {
             let bc = self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)];
-            bc == '.' || bc == c
+            bc == '.' as WideChar || bc == c as WideChar
         }) {
             return false;
         };
 
-        for (i, &c) in word.as_bytes().iter().enumerate() {
-            self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)] = c as char;
+        for (i, c) in word.chars_lossy().into_iter().enumerate() {
+            self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)] = c as WideChar;
         }
 
         self.empty = false;
@@ -87,7 +92,7 @@ impl WordSearch {
         true
     }
 
-    pub fn add_word(&mut self, word: String) {
+    pub fn add_word(&mut self, word: WideString) {
         if word.len() <= self.width && word.len() <= self.height {
             for _ in 0..self.width * self.height {
                 if self.try_add_word(&word, true) {
@@ -102,14 +107,14 @@ impl WordSearch {
             }
         }
 
-        panic!("Can't fit word {} into board", word);
+        panic!("Can't fit word {:#} into board", word.to_string().unwrap());
     }
 
     pub fn fill_random(&mut self) {
         for line in self.board.iter_mut() {
             for c in line.iter_mut() {
-                if *c == '.' {
-                    *c = self.rng.gen_range('A'..'Z');
+                if *c == wch!('.') {
+                    *c = self.rng.gen_range(wch!('A')..wch!('Z'));
                 }
             }
         }
@@ -158,7 +163,7 @@ fn main() {
 
     let mut ws = WordSearch::new(input.size, input.seed);
     for word in input.words.iter() {
-        ws.add_word(word.to_uppercase());
+        ws.add_word(WideString::from(word.as_str()));
     }
     ws.fill_random();
     ws.print();
