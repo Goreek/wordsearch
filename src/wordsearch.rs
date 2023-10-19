@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
-use wchar::*;
 use widestring::ustring::WideString;
 use widestring::WideChar;
 
@@ -106,7 +105,7 @@ impl WordSearch {
     pub fn fill_random(&mut self, noize: &Vec<WideChar>) {
         for line in self.board.iter_mut() {
             for c in line.iter_mut() {
-                if *c == wch!('.') {
+                if *c == '.' as WideChar {
                     *c = noize[self.rng.gen_range(0..noize.len())];
                 }
             }
