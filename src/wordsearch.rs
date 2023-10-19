@@ -8,7 +8,7 @@ use widestring::WideChar;
 pub struct WordSearch {
     width: usize,
     height: usize,
-    board: Vec<Vec<wchar_t>>,
+    board: Vec<Vec<WideChar>>,
     rng: StdRng,
     empty: bool,
 }
