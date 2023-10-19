@@ -29,9 +29,8 @@ impl WordSearch {
             let str_line: String = line
                 .iter()
                 .map(|&c| WideString::from_vec(vec![c]).to_string_lossy())
-                .intersperse(" ".to_string())
-                .collect();
-            // .fold( String::from(""), |s,acc| format!( "{} {}", acc, s));
+                .join(" ");
+
             println!("{}", str_line);
         }
     }
