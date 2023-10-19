@@ -79,6 +79,16 @@ impl WordSearch {
 
         false
     }
+
+    pub fn fill_random(&mut self) {
+        for line in self.board.iter_mut() {
+            for c in line.iter_mut(){ 
+                if *c == '.' {
+                    *c = self.rng.gen_range('A'..'Z');
+                }
+            }
+        }
+    }
 }
 
 
@@ -90,5 +100,6 @@ fn main() {
     ws.add_word(String::from("BOARD"));
     ws.add_word(String::from("BACKPACK"));
     ws.add_word(String::from("GENIUS"));
+    ws.fill_random();
     ws.print();
 }
