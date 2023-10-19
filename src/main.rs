@@ -110,11 +110,11 @@ impl WordSearch {
         panic!("Can't fit word {:#} into board", word.to_string().unwrap());
     }
 
-    pub fn fill_random(&mut self) {
+    pub fn fill_random(&mut self, noize: &Vec<WideChar>) {
         for line in self.board.iter_mut() {
             for c in line.iter_mut() {
                 if *c == wch!('.') {
-                    *c = self.rng.gen_range(wch!('A')..wch!('Z'));
+                    *c = noize[self.rng.gen_range(0..noize.len())];
                 }
             }
         }
@@ -125,6 +125,7 @@ impl WordSearch {
 struct WordSearchInput {
     size: usize,
     seed: u64,
+    noize: String,
     words: Vec<String>,
 }
 
@@ -163,8 +164,8 @@ fn main() {
 
     let mut ws = WordSearch::new(input.size, input.seed);
     for word in input.words.iter() {
-        ws.add_word(WideString::from(word.as_str()));
+        ws.add_word(WideString::from_str(word));
     }
-    ws.fill_random();
+    ws.fill_random(WideString::from_str(&input.noize).as_vec());
     ws.print();
 }
