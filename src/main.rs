@@ -9,8 +9,27 @@ mod wordsearch;
 struct WordSearchInput {
     size: usize,
     seed: u64,
+    #[serde(default = "noize_en")]
     noize: String,
     words: Vec<String>,
+}
+
+fn noize_en() -> String {
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".to_string()
+}
+
+impl Default for WordSearchInput {
+    fn default() -> Self {
+        WordSearchInput {
+            size: 10,
+            seed: 42,
+            noize: noize_en(),
+            words: ["EXAMEN", "MISTAKE", "TEACHER"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+        }
+    }
 }
 
 fn get_default_input_filepath() -> std::io::Result<PathBuf> {
@@ -44,7 +63,7 @@ fn main() {
         get_default_input_filepath().unwrap()
     };
 
-    let input = read_input_file(input_path).unwrap();
+    let input = read_input_file(input_path).expect("Failed to read input file");
 
     let mut ws = wordsearch::WordSearch::new(input.size, input.seed);
     for word in input.words.iter() {

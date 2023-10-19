@@ -1,6 +1,5 @@
 size: 10
 seed: 42
-noize: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 words:
 - "EXAMEN"
 - "MISTAKE"
