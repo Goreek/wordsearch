@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use wchar::*;
 use widestring::ustring::WideString;
 use widestring::WideChar;
+use itertools::Itertools;
 
 struct WordSearch {
     width: usize,
@@ -28,11 +29,13 @@ impl WordSearch {
 
     pub fn print(&self) {
         for line in self.board.iter() {
-            let str_line: Vec<String> = line
+            let str_line: String = line
                 .iter()
                 .map(|&c| WideString::from_vec(vec![c]).to_string_lossy())
+                .intersperse(" ".to_string())
                 .collect();
-            println!("{:?}", str_line);
+               // .fold( String::from(""), |s,acc| format!( "{} {}", acc, s));
+            println!("{}", str_line);
         }
     }
 
