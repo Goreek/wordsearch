@@ -2,6 +2,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::path::PathBuf;
 
 struct WordSearch {
     width: usize,
@@ -122,7 +123,7 @@ struct WordSearchInput {
     words: Vec<String>,
 }
 
-fn get_default_input_filepath() -> std::io::Result<std::path::PathBuf> {
+fn get_default_input_filepath() -> std::io::Result<PathBuf> {
     match env::current_exe() {
         Ok(exe_path) => {
             let input_filepath = exe_path
@@ -136,16 +137,24 @@ fn get_default_input_filepath() -> std::io::Result<std::path::PathBuf> {
     }
 }
 
-fn read_input_file() -> Result<WordSearchInput, std::io::Error> {
-    let contents = std::fs::read_to_string(get_default_input_filepath()?)
-        .expect("Should have been able to read the file");
+fn read_input_file(filepath: PathBuf) -> Result<WordSearchInput, std::io::Error> {
+    let contents =
+        std::fs::read_to_string(filepath).expect("Should have been able to read the file");
     let input_file: WordSearchInput = serde_yaml::from_str::<WordSearchInput>(&contents).unwrap();
 
     Ok(input_file)
 }
 
 fn main() {
-    let input = read_input_file().unwrap();
+    let args: Vec<String> = env::args().collect();
+
+    let input_path = if args.len() > 1 {
+        PathBuf::from(args[1].clone())
+    } else {
+        get_default_input_filepath().unwrap()
+    };
+
+    let input = read_input_file(input_path).unwrap();
 
     let mut ws = WordSearch::new(input.size, input.seed);
     for word in input.words.iter() {
