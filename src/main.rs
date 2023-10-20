@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
@@ -66,14 +67,17 @@ fn main() {
     let input = read_input_file(input_path).expect("Failed to read input file");
 
     let mut ws = wordsearch::WordSearch::new(input.size, input.seed);
-    for word in input.words.iter() {
-        ws.add_word(WideString::from_str(word));
-    }
+    let added_words: Vec<String> = input
+        .words
+        .into_iter()
+        .filter(|w| ws.add_word(WideString::from_str(w)))
+        .collect();
     ws.fill_random(WideString::from_str(&input.noize).as_vec());
     ws.print();
 
+    let footer = added_words.iter().join(" ");
     println!("");
-    for w in input.words {
+    for w in textwrap::wrap(&footer, ws.get_width() * 2 - 1) {
         println!("{}", w);
     }
 }

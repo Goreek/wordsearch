@@ -34,6 +34,10 @@ impl WordSearch {
         }
     }
 
+    pub fn get_width(&self) -> usize {
+        self.width
+    }
+
     fn idx(u: usize, i: usize, d: i32) -> usize {
         match d {
             -1 => u - i,
@@ -84,22 +88,22 @@ impl WordSearch {
         true
     }
 
-    pub fn add_word(&mut self, word: WideString) {
+    pub fn add_word(&mut self, word: WideString) -> bool {
         if word.len() <= self.width && word.len() <= self.height {
             for _ in 0..self.width * self.height {
                 if self.try_add_word(&word, true) {
-                    return;
+                    return true;
                 }
             }
 
             for _ in 0..self.width + self.height {
                 if self.try_add_word(&word, false) {
-                    return;
+                    return true;
                 }
             }
         }
 
-        panic!("Can't fit word {:#} into board", word.to_string().unwrap());
+        false
     }
 
     pub fn fill_random(&mut self, noize: &Vec<WideChar>) {
