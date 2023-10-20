@@ -10,6 +10,7 @@ pub struct WordSearch {
     board: Vec<Vec<WideChar>>,
     rng: StdRng,
     empty: bool,
+    added: Vec<String>,
 }
 
 impl WordSearch {
@@ -20,6 +21,7 @@ impl WordSearch {
             board: vec![vec!['.' as WideChar; sz]; sz],
             rng: StdRng::seed_from_u64(seed),
             empty: true,
+            added: vec![],
         }
     }
 
@@ -32,10 +34,12 @@ impl WordSearch {
 
             println!("{}", str_line);
         }
-    }
 
-    pub fn get_width(&self) -> usize {
-        self.width
+        let footer = self.added.iter().join(" ");
+        println!("");
+        for w in textwrap::wrap(&footer, self.width * 2 - 1) {
+            println!("{}", w);
+        }
     }
 
     fn idx(u: usize, i: usize, d: i32) -> usize {
@@ -88,16 +92,19 @@ impl WordSearch {
         true
     }
 
-    pub fn add_word(&mut self, word: WideString) -> bool {
+    pub fn add_word(&mut self, word: String) -> bool {
+        let wstr = WideString::from_str(&word);
         if word.len() <= self.width && word.len() <= self.height {
             for _ in 0..self.width * self.height {
-                if self.try_add_word(&word, true) {
+                if self.try_add_word(&wstr, true) {
+                    self.added.push(word);
                     return true;
                 }
             }
 
             for _ in 0..self.width + self.height {
-                if self.try_add_word(&word, false) {
+                if self.try_add_word(&wstr, false) {
+                    self.added.push(word);
                     return true;
                 }
             }
@@ -106,11 +113,13 @@ impl WordSearch {
         false
     }
 
-    pub fn fill_random(&mut self, noize: &Vec<WideChar>) {
+    pub fn fill_random(&mut self, noize: String) {
+        let wstr_noize = WideString::from_str(noize.as_str());
+        let syms = wstr_noize.as_vec();
         for line in self.board.iter_mut() {
             for c in line.iter_mut() {
                 if *c == '.' as WideChar {
-                    *c = noize[self.rng.gen_range(0..noize.len())];
+                    *c = syms[self.rng.gen_range(0..syms.len())];
                 }
             }
         }
