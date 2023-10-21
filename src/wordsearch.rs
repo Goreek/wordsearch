@@ -25,7 +25,7 @@ impl WordSearch {
         }
     }
 
-    pub fn print(&self) {
+    pub fn print_text(&self) {
         for line in self.board.iter() {
             let str_line: String = line
                 .iter()

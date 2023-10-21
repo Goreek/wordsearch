@@ -1,8 +1,21 @@
+use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
 
 mod wordsearch;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Input file with parameters for word search
+    #[arg(short, long)]
+    input: String,
+
+    /// Output print as html
+    #[arg(long, default_value_t = false)]
+    html: bool,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct WordSearchInput {
@@ -54,10 +67,11 @@ fn read_input_file(filepath: PathBuf) -> Result<WordSearchInput, std::io::Error>
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Args = Args::parse();
+    //let args: Vec<String> = env::args().collect();
 
-    let input_path = if args.len() > 1 {
-        PathBuf::from(args[1].clone())
+    let input_path = if args.input.is_empty() {
+        PathBuf::from(args.input)
     } else {
         get_default_input_filepath().unwrap()
     };
@@ -65,7 +79,9 @@ fn main() {
     let input = read_input_file(input_path).expect("Failed to read input file");
 
     let mut ws = wordsearch::WordSearch::new(input.size, input.seed);
-    input.words.into_iter().for_each(|w| {ws.add_word(w);});
+    input.words.into_iter().for_each(|w| {
+        ws.add_word(w);
+    });
     ws.fill_random(input.noize);
-    ws.print();
+    ws.print_text();
 }
