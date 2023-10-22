@@ -71,9 +71,9 @@ fn main() {
     //let args: Vec<String> = env::args().collect();
 
     let input_path = if args.input.is_empty() {
-        PathBuf::from(args.input)
-    } else {
         get_default_input_filepath().unwrap()
+    } else {
+        PathBuf::from(args.input)
     };
 
     let input = read_input_file(input_path).expect("Failed to read input file");
@@ -83,5 +83,10 @@ fn main() {
         ws.add_word(w);
     });
     ws.fill_random(input.noize);
-    ws.print_text();
+
+    if args.html {
+        ws.print_html();
+    } else {
+        ws.print_text();
+    }
 }
