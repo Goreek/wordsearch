@@ -1,3 +1,4 @@
+use build_html::*;
 use itertools::Itertools;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -25,13 +26,9 @@ impl WordSearch {
         }
     }
 
-    pub fn print(&self) {
-        for line in self.board.iter() {
-            let str_line: String = line
-                .iter()
-                .map(|&c| WideString::from_vec(vec![c]).to_string_lossy())
-                .join(" ");
-
+    pub fn print_text(&self) {
+        for line in self.get_board_strings().iter() {
+            let str_line: String = line.iter().join(" ");
             println!("{}", str_line);
         }
 
@@ -40,6 +37,38 @@ impl WordSearch {
         for w in textwrap::wrap(&footer, self.width * 2 - 1) {
             println!("{}", w);
         }
+    }
+
+    pub fn print_html(&self) {
+        let table = Table::from(self.get_board_strings()).with_attributes([("class", "wsboard")]);
+        let words_str = self.added.iter().join(" ");
+        let html = HtmlPage::new()
+            .with_title("Word Search")
+            .with_style(
+                r#"div.wordsearch{width: min-content;} 
+        table{table-layout: fixed; border-collapse: collapse;} 
+        td{font-size: 30px; border: 1px solid black; text-align: center;} 
+        p{width: fit-content;font-size: 20px;}"#,
+            )
+            .with_header(1, "Word Search:")
+            .with_container(
+                Container::default()
+                    .with_attributes([("class", "wordsearch")])
+                    .with_table(table)
+                    .with_paragraph(words_str),
+            );
+        println!("{}", html.to_html_string());
+    }
+
+    fn get_board_strings(&self) -> Vec<Vec<String>> {
+        self.board
+            .iter()
+            .map(|r| {
+                r.iter()
+                    .map(|&c| WideString::from_vec(vec![c]).to_string_lossy())
+                    .collect()
+            })
+            .collect()
     }
 
     fn idx(u: usize, i: usize, d: i32) -> usize {
@@ -94,7 +123,7 @@ impl WordSearch {
 
     pub fn add_word(&mut self, word: String) -> bool {
         let wstr = WideString::from_str(&word);
-        if word.len() <= self.width && word.len() <= self.height {
+        if wstr.len() <= self.width && wstr.len() <= self.height {
             for _ in 0..self.width * self.height {
                 if self.try_add_word(&wstr, true) {
                     self.added.push(word);
