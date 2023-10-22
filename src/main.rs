@@ -15,6 +15,10 @@ struct Args {
     /// Output print as html
     #[arg(long, default_value_t = false)]
     html: bool,
+
+    /// Skip filling unused cells
+    #[arg(long, default_value_t = false)]
+    noizeless: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -82,7 +86,10 @@ fn main() {
     input.words.into_iter().for_each(|w| {
         ws.add_word(w);
     });
-    ws.fill_random(input.noize);
+
+    if !args.noizeless {
+        ws.fill_random(input.noize);
+    }
 
     if args.html {
         ws.print_html();
