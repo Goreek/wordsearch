@@ -10,7 +10,6 @@ pub struct WordSearch {
     height: usize,
     board: Vec<Vec<WideChar>>,
     rng: StdRng,
-    empty: bool,
     added: Vec<String>,
 }
 
@@ -21,7 +20,6 @@ impl WordSearch {
             height: sz,
             board: vec![vec!['.' as WideChar; sz]; sz],
             rng: StdRng::seed_from_u64(seed),
-            empty: true,
             added: vec![],
         }
     }
@@ -96,7 +94,7 @@ impl WordSearch {
             _ => self.rng.gen_range(0..self.width),
         };
 
-        if need_shared && !self.empty {
+        if need_shared {
             if !word.chars_lossy().into_iter().enumerate().any(|(i, c)| {
                 let bc = self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)];
                 bc == c as WideChar
@@ -116,18 +114,18 @@ impl WordSearch {
             self.board[Self::idx(y0, i, vd)][Self::idx(x0, i, hd)] = c as WideChar;
         }
 
-        self.empty = false;
-
         true
     }
 
     pub fn add_word(&mut self, word: String) -> bool {
         let wstr = WideString::from_str(&word);
         if wstr.len() <= self.width && wstr.len() <= self.height {
-            for _ in 0..self.width * self.height {
-                if self.try_add_word(&wstr, true) {
-                    self.added.push(word);
-                    return true;
+            if !self.added.is_empty() {
+                for _ in 0..self.width * self.height {
+                    if self.try_add_word(&wstr, true) {
+                        self.added.push(word);
+                        return true;
+                    }
                 }
             }
 
