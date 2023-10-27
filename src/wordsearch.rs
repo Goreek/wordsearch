@@ -37,6 +37,24 @@ impl WordSearch {
         }
     }
 
+    pub fn print_md(&self) {
+        println!("Word Search:");
+        println!("");
+        println!("|{}", vec![" |"; self.width].join(""));
+        let header = (0..self.width).into_iter().map(|_| "---").join(" | ");
+        println!("| {} |", header);
+        for line in self.get_board_strings().iter() {
+            let str_line: String = line.iter().join(" | ");
+            println!("| {} |", str_line);
+        }
+
+        let footer = self.added.iter().join(" ");
+        println!("");
+        for w in textwrap::wrap(&footer, self.width * 2 - 1) {
+            println!("{}", w);
+        }
+    }
+
     pub fn print_html(&self) {
         let table = Table::from(self.get_board_strings()).with_attributes([("class", "wsboard")]);
         let words_str = self.added.iter().join(" ");

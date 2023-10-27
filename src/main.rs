@@ -5,6 +5,38 @@ use std::path::PathBuf;
 
 mod wordsearch;
 
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+enum PrintLayout
+{
+    Text,
+    Html,
+    Markdown
+}
+
+impl std::fmt::Display for PrintLayout {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Self::Text => "text",
+            Self::Html => "html",
+            Self::Markdown => "md",
+        };
+        s.fmt(f)
+    }
+}
+impl std::str::FromStr for PrintLayout {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "text" => Ok(Self::Text),
+            "html" => Ok(Self::Html),
+            "md" => Ok(Self::Markdown),
+            _ => Err(format!("Unknown print layout: {s}")),
+        }
+    }
+}
+
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -13,8 +45,8 @@ struct Args {
     input: String,
 
     /// Output print as html
-    #[arg(long, default_value_t = false)]
-    html: bool,
+    #[arg(short, long, default_value_t = PrintLayout::Text)]
+    layout: PrintLayout,
 
     /// Skip filling unused cells
     #[arg(long, default_value_t = false)]
@@ -91,9 +123,10 @@ fn main() {
         ws.fill_random(input.noize);
     }
 
-    if args.html {
-        ws.print_html();
-    } else {
-        ws.print_text();
+    match args.layout {
+        PrintLayout::Text => {ws.print_text();},
+        PrintLayout::Html => {ws.print_html();}
+        PrintLayout::Markdown => {ws.print_md();},
     }
+
 }
