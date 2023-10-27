@@ -6,11 +6,10 @@ use std::path::PathBuf;
 mod wordsearch;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-enum PrintLayout
-{
+enum PrintLayout {
     Text,
     Html,
-    Markdown
+    Markdown,
 }
 
 impl std::fmt::Display for PrintLayout {
@@ -35,7 +34,6 @@ impl std::str::FromStr for PrintLayout {
         }
     }
 }
-
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -124,9 +122,14 @@ fn main() {
     }
 
     match args.layout {
-        PrintLayout::Text => {ws.print_text();},
-        PrintLayout::Html => {ws.print_html();}
-        PrintLayout::Markdown => {ws.print_md();},
+        PrintLayout::Text => {
+            ws.print_text();
+        }
+        PrintLayout::Html => {
+            ws.print_html();
+        }
+        PrintLayout::Markdown => {
+            ws.print_md();
+        }
     }
-
 }
