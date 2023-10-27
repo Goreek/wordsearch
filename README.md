@@ -7,6 +7,7 @@ The utility takes input file with words and other parameters and generates:
 
 Word Search:
 
+| | | | | | | | | | |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | S | S | D | S | T | K | B | D | B | F |
 | K | U | Q | H | E | O | N | I | A | X |
@@ -20,7 +21,10 @@ Word Search:
 | S | C | H | O | O | L | B | U | S | Q |
 
 EXAMEN MISTAKE
+
 SCHOOLBUS TEACHER
+
 BOARD BACKPACK
+
 GENIUS
 
